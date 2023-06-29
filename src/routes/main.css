@@ -1,0 +1,23 @@
+/* @import url("https://use.typekit.net/ktu8kpk.css"); */
+body {
+   margin: 0;
+   padding: 0;
+   background-color: #262626;
+}
+* {
+   font-size: 30px;
+   color: #f4f4f4;
+   font-family: vendetta, serif;
+   /* font-family: "Rubik", sans-serif; */
+   font-weight: 500;
+}
+p {
+   font-size: 30px;
+}
+h1 {
+   letter-spacing: -7px;
+   font-weight: 700;
+   font-style: normal;
+   font-size: 120px;
+   margin: 0;
+}
