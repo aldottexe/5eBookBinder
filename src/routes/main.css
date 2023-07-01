@@ -1,4 +1,4 @@
-/* @import url("https://use.typekit.net/ktu8kpk.css"); */
+@import url("https://use.typekit.net/ktu8kpk.css");
 body {
    margin: 0;
    padding: 0;
@@ -20,4 +20,8 @@ h1 {
    font-style: normal;
    font-size: 120px;
    margin: 0;
+}
+canvas {
+   position: absolute;
+   z-index: -1;
 }

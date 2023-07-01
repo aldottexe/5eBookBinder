@@ -3,6 +3,7 @@
    import spellList from './spellList.json'
    import Nav from '$lib/Nav.svelte'
    import { generate } from './generator';
+   import { fade, fly } from 'svelte/transition';
 
    //stores specifics about selected spells
    let spellInfo = [];
@@ -53,22 +54,20 @@
       <!-- left side -->
       <div id="card" class="w50">
          {#each spellInfo as spell}
-            <h1>{spell.title}</h1>
-            <h3>Level: {spell.level}</h3>
-            <p>{@html spell.description}</p>
+            <img src={spell} alt="">
          {/each}
       </div>
 
       <!-- right side -->
       <div id="list" class="w50">
          <div class="selectedSpellList">
-         <!-- {#if selectedSpells.length == 0} -->
-            <p class="directions {(selectedSpells.length > 0)?"hidden":""}">
+         {#if selectedSpells.length == 0}
+            <p class="directions" in:fade={{duration: 1000}} out:fade={{duration: 100}}>
                <span>[!]</span>Type some spell names into the box to add 
                them to your book. When you've added everything hit generate!</p>
-         <!-- {/if} -->
+         {/if}
          {#each selectedSpells as spell, i}
-            <div class="selectedSpell" on:click={() => removeSpell(i)}> 
+            <div class="selectedSpell" on:click={() => removeSpell(i)} transition:fly={{duration: 200, y:20}}> 
                <p>{spell[0]}</p>
             </div>
          {/each}
@@ -81,7 +80,7 @@
             </form>
 
             {#if selectedSpells.length > 0}
-               <button on:click={async () => spellInfo = await generate(selectedSpells)}>Generate</button>
+               <button on:click={async () => spellInfo = await generate(selectedSpells)} transition:fade={{duration:100}}>Generate</button>
             {/if}
          </div >
 
@@ -116,16 +115,23 @@
    }
    .selectedSpellList{
       height: 40vh;
-      overflow: scroll;
+      overflow-x: hidden;
+      overflow-y: scroll;
+      padding-left: 15px;
+      width: 430px;
    }
    .selectedSpell{
       cursor: default;
       position: relative;
+      transition: ease .5s transform;
    }
    .selectedSpell p{
       padding-bottom: 5px;
       border-bottom: solid 2px #f4f4f466;
       width: 400px;
+   }
+   .selectedSpell:hover{
+      transform: scale(1.05);
    }
    .selectedSpell p:hover::before{
       content: url(./line.svg);
@@ -156,8 +162,29 @@
    section{
       max-height: 100vh;
    }
+   .directions{
+      opacity: 50%;
+      position: absolute;
+   }
+   .directions span{
+      font-size: 35px;
+      position: absolute;
+      transform: translateX(-40px) rotateZ(-5deg);
+   }
+   .controls{
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      width: 400px;
+      margin-left: 15px;
+   }
+   button{
+      background-color: rgb(74, 135, 104);
+      font-size: 30px;
+      padding: 10px;
+      border: none;
+   }
    .searchBar{
-      box-sizing: border-box;
       font-size: 30px;
       background-color: #00000000;
       border: none;
@@ -167,40 +194,5 @@
    }
    .searchBar:focus{
       outline: none;
-   }
-   .directions{
-      opacity: 50%;
-      transition: all .5s ease;
-      position: absolute;
-   }
-   .directions span{
-      font-size: 35px;
-      position: absolute;
-      transform: translateX(-40px) rotateZ(-5deg);
-   }
-   .hidden{
-      opacity: 0;
-   }
-   .blink{
-      /* animation: blink alternate 3s ease infinite; */
-   }
-   @keyframes blink{
-      to{
-         opacity: 70%;
-      }
-      from{
-         opacity: 30%;
-      }
-   }
-   .controls{
-      display: flex;
-      justify-content: space-between;
-   }
-   button{
-      background-color: rgb(74, 135, 104);
-      font-size: 30px;
-      padding: 10px;
-      border: none;
-      position: relative;
    }
 </style>
