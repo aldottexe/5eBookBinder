@@ -1,7 +1,6 @@
 import * as THREE from "three";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
-export function setup(canvas, window) {
+export function setupScene(canvas, window) {
    //RENDERER
    const renderer = new THREE.WebGLRenderer({
       alpha: true,
@@ -15,7 +14,7 @@ export function setup(canvas, window) {
    const fov = 75;
    const aspect = window.innerWidth / window.innerHeight; // the canvas default
    const near = 0.1;
-   const far = 7;
+   const far = 10;
    const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
    camera.position.z = 3;
    camera.position.y = 3;
@@ -47,7 +46,7 @@ export function setup(canvas, window) {
 
    const redraw = () => renderer.render(scene, camera);
 
-   return { redraw, scene };
+   return { redraw, scene, camera };
 }
 
 function bezier(t, points) {

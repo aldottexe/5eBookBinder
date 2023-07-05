@@ -5,7 +5,7 @@
    import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
    import { onMount } from 'svelte';
    import {spring} from 'svelte/motion'
-   import { setup } from './3dHelper';
+   import { setupScene } from '$lib/3dHelper';
    let canvas;
    let click;
    let anime = spring({x : 0, y: 0, z: 0, rx: 0, ry: 0, rz: 0, o: 0}, {
@@ -15,7 +15,8 @@
    let idle = true;
 
    onMount(()=>{
-      const {redraw, scene} = setup(canvas, window);
+      const {redraw, scene} = setupScene(canvas, window);
+
       // GRADIENTMAP
       let gmap = new THREE.TextureLoader().load("/fiveTone.jpg", gmap => {
          gmap.minFilter = THREE.NearestFilter;
@@ -39,8 +40,6 @@
          book.scale.x = scale;
          book.scale.y = scale;
          book.scale.z = scale;
-      
-         
 
          scene.add(book);
          requestAnimationFrame(render);
@@ -61,8 +60,6 @@
 
          requestAnimationFrame(render);
       }
-
-      requestAnimationFrame(render);
 
       click = () => {
          console.log(book.rotation.y)
