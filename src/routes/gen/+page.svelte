@@ -2,6 +2,7 @@
    //list of available spells stored in [[name, id], ...] format
    import spellList from './spellList.json'
    import Nav from '$lib/Nav.svelte'
+   import Toggle from '$lib/Toggle.svelte'
    import Generator from '$lib/Generator.svelte';
 
    import { fade, fly } from 'svelte/transition';
@@ -25,14 +26,34 @@
    // toggles whether you wanna generate cards or a spellbook
    let toggleSelection;
    let generateBook = true;
+   
+   let generateButtonClick;
+
+   let useOffset = true;
 
    // the generate function that gets 
    // assigned when the generator componenent is rendered
    let generate;
 
-   let anime = spring({bx : 0, by: 0, bz: 0, cx : 0, cy: 0, cz: 0, }, {
-      stiffness: 0.007,
-      damping: 0.1
+   let xOffset = spring(0, {duration: 100})
+
+   let anime = spring({
+         bx: -2, 
+         by: 0, 
+         bz: 0, 
+         cx: -2, 
+         cy: 0, 
+         cz: -20, 
+         brx: .5 * 3.14, 
+         bry: -.5*3.14, 
+         brz:0
+      }, {
+         stiffness: 0.05,
+         damping: 0.3
+   })
+   let open = spring({b:0, c:0}, {
+      stiffness: .01,
+      damping: .2,
    })
 
    // the list of spells that fit the user's search
@@ -71,11 +92,29 @@
       camera.position.y = 0
       camera.position.z = 5
       camera.lookAt(0,0,0)
+   
+      // scale how far left the objects sit relative to the window width.
+      // the useOffset variable controls whether or not this is used
+      const calculateXOffset = () => {
+         if(useOffset){
+            let yoff = - (800-window.innerHeight)/220 + .3
+            console.log(yoff)
+            let xoff = - 2.6* window.innerWidth/1000 + 2.2 + yoff
+            xOffset.set(xoff)
+         }
+         else
+            xOffset.set(0)
+      };
+      window.addEventListener("resize", calculateXOffset);
+      calculateXOffset();
+
 
       // GRADIENTMAP
       let gmap = new THREE.TextureLoader().load("/fiveTone.jpg", gmap => {
          gmap.minFilter = THREE.NearestFilter;
          gmap.magFilter = THREE.NearestFilter;
+         book.material.gradientMap = gmap;
+         card.material.gradientMap = gmap;
          return gmap;
       });
 
@@ -86,16 +125,12 @@
 
          let tmap = book.material.map;
          book.material = new THREE.MeshToonMaterial();
-         book.material.gradientMap = gmap;
          book.material.map = tmap;
 
          let scale = 0.08;
          book.scale.x = scale;
          book.scale.y = scale;
          book.scale.z = scale;
-         book.rotation.y = -.5 * 3.14;
-         book.rotation.x = .5 * 3.14;
-         book.position.x = -2;
 
          scene.add(book);
       });
@@ -105,7 +140,6 @@
 
          let tmap = card.material.map;
          card.material = new THREE.MeshToonMaterial();
-         card.material.gradientMap = gmap;
          card.material.map = tmap;
 
          let scale = 0.08;
@@ -113,7 +147,7 @@
          card.scale.y = scale;
          card.scale.z = scale;
          card.position.x = -3;
-         card.rotation.y = 1.5 * 3.15
+         card.rotation.y = 1.5 * 3.14
 
          card.rotation.x = .5 * 3.14
 
@@ -121,62 +155,109 @@
          scene.add(card);
          requestAnimationFrame(render);
       });
+
+      // const light = new THREE.PointLight(0xffffff, 1, 3);
+      // light.position.z = 4;
+      // light.position.x = 2;
+      // light.position.y = 0;
+      // scene.add(light);
+
+      
       function render(time) {
-         redraw();
-         // book.morphTargetInfluences[0] 
-         // card.morphTargetInfluences[0] 
-         
-         card.position.x = $anime.cx;
+         card.position.x = $anime.cx + $xOffset;
          card.position.y = $anime.cy;
          card.position.z = $anime.cz;
-         book.position.x = $anime.bx;
+         book.position.x = $anime.bx + $xOffset;
          book.position.y = $anime.by;
          book.position.z = $anime.bz;
+         book.rotation.x = $anime.brx;
+         book.rotation.y = $anime.bry;
+         book.rotation.z = $anime.brz;
 
-
+         card.morphTargetInfluences[0] = $open.c
+         book.morphTargetInfluences[0] = $open.b
 
          // card.position.y = (Math.sin(time/500)+1)/8;
          // book.position.y = (Math.sin(time/500+1)+1)/8;
+         redraw();
          requestAnimationFrame(render);
       }
-      toggleSelection = ()=>{
-         generateBook = !generateBook
-         if(generateBook){
-            anime.set({bx: -2, by: 0, bz: 0, cx: -1.5, cy: 0, cz: -2});
-         }else{
-            anime.set({bx: -4.6, by: 0, bz: -2, cx: -2, cy: 0, cz: 0});
-         }
+      toggleSelection = () => {
+         // anime.set({...$anime, bx:-.5, bz: -.5, cx: -3.5, cz: -.5})
+         setTimeout(()=>{
+            if(generateBook)
+               anime.set({...$anime, bx: -2, bz: 0, cx: -2, cz: -20});
+            else
+               anime.set({...$anime, bx: -2, bz: -20, cx: -2, cz: 0});
+         }, 50)
       }
+      generateButtonClick = async () => {
+         useOffset = false;
+         calculateXOffset();
+
+         if(generateBook){
+            open.set({b:1, c:0})
+            anime.set({...$anime, 
+               brx: 0 * 3.14, 
+               bry: -1 * 3.14, 
+               brz: -.5 * 3.14,
+               bx: .2,
+               bz: 2,
+            })
+         }else{
+            open.set({b:0, c:1})
+            anime.set({...$anime, 
+               cx: 0,
+               cz: 2,
+               cy: -1,
+            })
+
+         }
+         spellInfo = await generate(selectedSpells)
+      }
+
    });
 
 
 </script>
 
 
+<Generator bind:generate={generate}/>
+
 <section>
    <canvas bind:this={canvas}></canvas>
+
    <Nav></Nav>
+
    <h1>Generator</h1>
-   <button on:click={toggleSelection}>toggle</button>
+
    <div class="content">
+
       <!-- left side -->
-      <div id="card" class="w50">
-         <Generator bind:generate={generate}/>
+      <div id="card" class="w50 bottomCenter">
+         <div class="toggle">
+            Cards
+            <Toggle bind:state = {generateBook} onClick = {toggleSelection}/>
+            Book
+         </div>
       </div>
+
 
       <!-- right side -->
       <div id="list" class="w50">
+
          <div class="selectedSpellList">
-         {#if selectedSpells.length == 0}
-            <p class="directions" in:fade={{duration: 1000}} out:fade={{duration: 100}}>
-               <span>[!]</span>Type some spell names into the box to add 
-               them to your book. When you've added everything hit generate!</p>
-         {/if}
-         {#each selectedSpells as spell, i}
-            <div class="selectedSpell" on:click={() => removeSpell(i)} transition:fly={{duration: 200, y:20}}> 
-               <p>{spell[0]}</p>
-            </div>
-         {/each}
+            {#if selectedSpells.length == 0}
+               <p class="directions" in:fade={{duration: 1000}} out:fade={{duration: 100}}>
+                  <span>[!]</span>Type some spell names into the box to add 
+                  them to your book. When you've added everything hit generate!</p>
+            {/if}
+
+            {#each selectedSpells as spell, i}
+               <div class="selectedSpell" on:click={() => removeSpell(i)} transition:fly={{duration: 200, y:20}}> 
+                  <p>{spell[0]}</p>
+               </div>
+            {/each}
          </div>
 
          <div class="controls">
@@ -187,7 +268,7 @@
 
             <!-- generate button -->
             {#if selectedSpells.length > 0}
-               <button on:click={async () => spellInfo = await generate(selectedSpells)} transition:fade={{duration:100}}>Generate</button>
+               <button on:click={generateButtonClick} transition:fade={{duration:100}}>Generate</button>
             {/if}
          </div >
 
@@ -304,5 +385,24 @@
    }
    img{
       width: 100%;
+   }
+   .bottomCenter{
+      display: flex;
+      justify-content: center;
+      align-items:end;
+   }
+   .toggle{
+      width: 215px;
+      margin: 0 auto;
+      color: #f4f4f488;
+   }
+   #card{
+      flex-direction: column-reverse;
+      justify-content: flex-start;
+   }
+   canvas{
+      position: absolute;
+      z-index: 99;
+      pointer-events: none;
    }
 </style>

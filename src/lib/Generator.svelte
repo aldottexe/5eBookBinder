@@ -1,8 +1,12 @@
 <script>
 import * as htmlToImage from "html-to-image";
+import {tick} from "svelte";
+import {fade} from 'svelte/transition'
 
 const ppi = 300;
 const pixelRatio = ppi / 100;
+
+let cardNum = 0;
 
 const colors = [
    "red",
@@ -17,60 +21,116 @@ const colors = [
    "orange",
 ];
 
-let json = {};
-let card;
+generatorOptions = {
+   width: 300,
+   height: 400,
+   pixelRatio: pixelRatio,
+   style: {
+      backgroundColor: "white",
+      fontFamily: "comic sans ms",
+      width: "300px",
+      height: "400px",
+   },
+}
+
+let cardTemplateData = {};
+let cardTemplate;
+
+let cardOverflowTemplate;
+let descOverflow = ""
+
 let spellInfo = [];
+let spellImages = [];
 
 export async function generate(selectedSpells) {
-   spellInfo = selectedSpells.map(async spell => {
+
+   let spellDataObjects = selectedSpells.map(async spell => {
       let res = await fetch(`./spells/${spell[1]}.json`);
-      json = await res.json();
-
-      console.log("overflowing: " + (card.scrollHeight > card.clientHeight));
-
-      const img = await htmlToImage.toPng(card, {
-         width: 300,
-         height: 400,
-         pixelRatio: pixelRatio,
-         style: {
-            backgroundColor: "white",
-            fontFamily: "comic sans ms",
-            width: "300px",
-            height: "400px",
-         },
-      });
-
-      return img;
+      return await res.json();
    });
+   spellDataObjects = await Promise.all(spellDataObjects);
+
+   spellDataObjects.sort((a, b) => 
+      parseInt(a.level) - parseInt(b.level)
+   );
+
+   for (const [i, spellDataObject] of spellDataObjects.entries()) {
+      cardTemplateData = spellDataObject;
+      await tick();
+      let overflow = chopAtOverflow(cardTemplate, spellDataObject, cardTemplateData);
+
+      //GENERATE CARD
+      const img = await htmlToImage.toPng(cardTemplate, generatorOptions);
+      
+      spellInfo[i] = img;
+   }
+
 
    spellInfo = await Promise.all(spellInfo);
+
    return spellInfo;
+}
+
+function checkOverflow(element){
+   return (
+      element.clientHeight > 400
+   )
+}
+
+async function chopAtOverflow(element, spellDataObject){
+   let newDesc = "";
+
+   await tick();
+   while (element.clientHeight > 400){
+      const lastIndex = spellDataObject.description.lastIndexOf(" ");
+      newDesc = spellDataObject.description.substring(lastIndex) + " " + newDesc;
+      spellDataObject.description = spellDataObject.description.substring(0, lastIndex);
+      
+      console.log("removed" + newDesc);
+
+      cardTemplateData = spellDataObject
+
+      await tick();
+   }
+   return newDesc;
 }
 </script>
 
-<!-- displays the final images -->
-{#each spellInfo as spell}
-   <img src={spell} alt="">
-{/each}
 
 <!-- a hidden place to render the html for the cards -->
 <div class="hidden">
-   <div class="card" bind:this={card}>
-      <h1>{json.title}</h1>
+   <div class="card" bind:this={cardTemplate}>
+      <h1>{cardTemplateData.title}</h1>
 
       <p class="level"
-      style={`color: ${colors[json.level]}`}>{json.level === 0 ? "Cantrip" : `Level ${json.level}`}</p>
+         style={`color: ${colors[cardTemplateData.level]}`}>{cardTemplateData.level === 0 ? "Cantrip" : `Level ${cardTemplateData.level}`}
+      </p>
 
-      <div><b>Casting Time:</b> {json["casting time"]}</div>
-      <div><b>Range:</b> {json["range"]}</div>
-      <div><b>Components:</b> {json["componenents"]}</div>
-      <div><b>Duration:</b> {json["duration"]}</div>
+      <div><b>Casting Time:</b> {cardTemplateData["casting time"]}</div>
+      <div><b>Range:</b> {cardTemplateData["range"]}</div>
+      <div><b>Components:</b> {cardTemplateData["componenents"]}</div>
+      <div><b>Duration:</b> {cardTemplateData["duration"]}</div>
 
       <p>
-         {@html json.description}
+         {@html cardTemplateData.description}
       </p>
    </div>
+
+   <div class="card" bond:this={cardOverflowTemplate}>
+   {@html descOverflow}
+   
+   </div>
 </div>
+
+{#if spellInfo.length > 0}
+   <div class="display" transition:fade={{duration:100}}>
+      <div>
+         <!-- displays the final images -->
+         <img class="spellCard" src={spellInfo[cardNum]} alt="">
+         <input type="range" min="0" max={spellInfo.length - 1} bind:value={cardNum}/>
+      </div>
+   </div>
+{/if}
 
 <style>
    .card :global(*){
@@ -83,8 +143,9 @@ export async function generate(selectedSpells) {
             box-sizing: border-box;
             padding: 15px 30px;
             width: 300px;
-            height: 400px;
+            /* min-height: 400px; */
             margin: 0;
+            
    }
    .card :global(h1){
       letter-spacing: 0;
@@ -109,12 +170,27 @@ export async function generate(selectedSpells) {
    }
    .hidden{
       height: 0;
-      overflow: hidden;
+      /* overflow: hidden; */
    }
    b{
       font-weight: bold;
    }
    :global(ul){
       padding-left: 20px;
+   }
+   .display{
+      position: absolute;
+      z-index: 999;
+      display: flex;
+      justify-content: center;
+      align-content: center;
+      flex-wrap: wrap;
+      text-align: center;
+      width: 100vw;
+      height: 100vh;
+      background-color: #00000088;
+   }
+   .spellCard{
+      display: block;
    }
 </style>

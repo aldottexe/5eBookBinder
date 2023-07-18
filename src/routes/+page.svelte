@@ -46,7 +46,6 @@
       });
 
       function render(time) {
-         redraw();
          book.rotation.x = $anime.rx;
          book.rotation.y = $anime.ry;
          book.rotation.z = $anime.rz;
@@ -58,6 +57,7 @@
          if(idle)
             $anime.ry += .01
 
+         redraw();
          requestAnimationFrame(render);
       }
 
