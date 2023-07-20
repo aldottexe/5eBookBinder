@@ -35,6 +35,8 @@
    // assigned when the generator componenent is rendered
    let generate;
 
+   let resetScene;
+
    let xOffset = spring(0, {duration: 100})
 
    let anime = spring({
@@ -110,7 +112,7 @@
 
 
       // GRADIENTMAP
-      let gmap = new THREE.TextureLoader().load("/fiveTone.jpg", gmap => {
+      new THREE.TextureLoader().load("/fiveTone.jpg", gmap => {
          gmap.minFilter = THREE.NearestFilter;
          gmap.magFilter = THREE.NearestFilter;
          book.material.gradientMap = gmap;
@@ -177,20 +179,36 @@
          card.morphTargetInfluences[0] = $open.c
          book.morphTargetInfluences[0] = $open.b
 
-         // card.position.y = (Math.sin(time/500)+1)/8;
-         // book.position.y = (Math.sin(time/500+1)+1)/8;
          redraw();
          requestAnimationFrame(render);
       }
       toggleSelection = () => {
-         // anime.set({...$anime, bx:-.5, bz: -.5, cx: -3.5, cz: -.5})
-         setTimeout(()=>{
-            if(generateBook)
-               anime.set({...$anime, bx: -2, bz: 0, cx: -2, cz: -20});
-            else
-               anime.set({...$anime, bx: -2, bz: -20, cx: -2, cz: 0});
-         }, 50)
-      }
+         if(generateBook)
+            anime.set({
+               brx: .5 * 3.14, 
+               bry: -.5*3.14, 
+               brz:0, 
+               bx: -2, 
+               by: 0,
+               bz: 0, 
+               cx: -2, 
+               cy: 0,
+               cz: -20
+            });
+         else
+            anime.set({
+               brx: .5 * 3.14, 
+               bry: -.5*3.14, 
+               brz:0, 
+               bx: -2, 
+               by: 0,
+               bz: -20, 
+               cx: -2, 
+               cy: 0,
+               cz: 0
+            });
+      };
+
       generateButtonClick = async () => {
          useOffset = false;
          calculateXOffset();
@@ -216,13 +234,20 @@
          spellInfo = await generate(selectedSpells)
       }
 
+      resetScene = () => {
+         open.set({b:0, c:0})
+         useOffset = true;
+         calculateXOffset();
+         toggleSelection();
+      }
+
    });
 
 
 </script>
 
 
-<Generator bind:generate={generate}/>
+<Generator bind:generate={generate} onClose={resetScene}/>
 
 <section>
    <canvas bind:this={canvas}></canvas>
@@ -250,10 +275,11 @@
             {#if selectedSpells.length == 0}
                <p class="directions" in:fade={{duration: 1000}} out:fade={{duration: 100}}>
                   <span>[!]</span>Type some spell names into the box to add 
-                  them to your book. When you've added everything hit generate!</p>
+                  them to your book. Once you've added everything, hit generate!</p>
             {/if}
 
             {#each selectedSpells as spell, i}
+               <!-- svelte-ignore a11y-click-events-have-key-events -->
                <div class="selectedSpell" on:click={() => removeSpell(i)} transition:fly={{duration: 200, y:20}}> 
                   <p>{spell[0]}</p>
                </div>
@@ -275,6 +301,7 @@
          {#if userInput.length > 0 && spellsFiltered.length > 0}
             <div id="suggestions">
                {#each spellsFiltered as spell}
+                  <!-- svelte-ignore a11y-click-events-have-key-events -->
                   <p  class="suggestion" on:click={() => selectSpell(spell)}>
                      {spell[0]}
                   </p>
@@ -353,6 +380,7 @@
    .directions{
       opacity: 50%;
       position: absolute;
+      width: 430px;
    }
    .directions span{
       font-size: 35px;

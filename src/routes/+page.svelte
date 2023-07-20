@@ -6,6 +6,7 @@
    import { onMount } from 'svelte';
    import {spring} from 'svelte/motion'
    import { setupScene } from '$lib/3dHelper';
+
    let canvas;
    let click;
    let anime = spring({x : 0, y: 0, z: 0, rx: 0, ry: 0, rz: 0, o: 0}, {
@@ -62,7 +63,6 @@
       }
 
       click = () => {
-         console.log(book.rotation.y)
          console.log("click")
          idle = false;
          let rotations = book.rotation.y - (book.rotation.y % 6.28)

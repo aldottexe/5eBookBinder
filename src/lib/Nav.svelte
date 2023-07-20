@@ -1,17 +1,19 @@
 <script>
    export let position = "static";
 </script>
+
 <nav style="position:{position}">
-   <a 
-      href="/" >
+   <a href="/" >
       Home
    </a>
-   <a 
-      href="/gen">
+   <a href="/gen">
       Generator
    </a>
-
+   <a href="/about">
+      About
+   </a>
 </nav>
+
 <style>
 nav{
    display:flex;
