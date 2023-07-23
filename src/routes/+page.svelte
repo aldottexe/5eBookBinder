@@ -6,6 +6,8 @@
    import { onMount } from 'svelte';
    import {spring} from 'svelte/motion'
    import { setupScene } from '$lib/3dHelper';
+   import { fade } from 'svelte/transition';
+   import PageTransition from '$lib/PageTransition.svelte';
 
    let canvas;
    let click;
@@ -56,7 +58,7 @@
          book.morphTargetInfluences[0] = $anime.o;
 
          if(idle)
-            $anime.ry += .01
+            $anime.ry = time * .0005;
 
          redraw();
          requestAnimationFrame(render);
@@ -75,20 +77,21 @@
 </script>
 
 
-
-<canvas bind:this={canvas}></canvas>
-<div class="content" >
-   <div style="
-      opacity:{1-$anime.o};
-      transform:scale({.2*$anime.o+1})
-      ">
-      <Nav position="sticky"></Nav>
-      <h1>5eBookBinder</h1>
-      <p>An automated spell book generator for<br/>Dungeons&Dragons</p>
-      <Cta href="gen" text="~ PRESS TO START ~" onclick={click} delay=2000/>
+<PageTransition>
+   <canvas bind:this={canvas}></canvas>
+   
+   <div class="content" transition:fade={{duration:200}}>
+      <div style="
+         opacity:{1-$anime.o};
+         transform:scale({.2*$anime.o+1})
+         ">
+         <Nav position="sticky"></Nav>
+         <h1>5eBookBinder</h1>
+         <p>An automated spell book generator for<br/>Dungeons&Dragons</p>
+         <Cta href="gen" text="~ PRESS TO START ~" onclick={click} delay=2000/>
+      </div>
    </div>
-</div>
-
+</PageTransition>
 
 
 <style>

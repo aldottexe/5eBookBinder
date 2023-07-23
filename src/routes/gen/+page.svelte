@@ -7,6 +7,7 @@
 
    import { fade, fly } from 'svelte/transition';
    import {spring} from 'svelte/motion'
+   import PageTransition from '$lib/PageTransition.svelte';
 
    import * as THREE from 'three'
    import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
@@ -50,7 +51,7 @@
          bry: -.5*3.14, 
          brz:0
       }, {
-         stiffness: 0.05,
+         stiffness: 0.03,
          damping: 0.3
    })
    let open = spring({b:0, c:0}, {
@@ -210,28 +211,28 @@
       };
 
       generateButtonClick = async () => {
-         useOffset = false;
-         calculateXOffset();
 
          if(generateBook){
-            open.set({b:1, c:0})
-            anime.set({...$anime, 
-               brx: 0 * 3.14, 
-               bry: -1 * 3.14, 
-               brz: -.5 * 3.14,
-               bx: .2,
-               bz: 2,
-            })
+            // open.set({b:1, c:0})
+            // anime.set({...$anime, 
+            //    brx: 0 * 3.14, 
+            //    bry: -1 * 3.14, 
+            //    brz: -.5 * 3.14,
+            //    bx: .2,
+            //    bz: 2,
+            // })
          }else{
+            useOffset = false;
+            calculateXOffset();
+
             open.set({b:0, c:1})
             anime.set({...$anime, 
                cx: 0,
                cz: 2,
                cy: -1,
             })
-
+            spellInfo = await generate(selectedSpells)
          }
-         spellInfo = await generate(selectedSpells)
       }
 
       resetScene = () => {
@@ -249,6 +250,7 @@
 
 <Generator bind:generate={generate} onClose={resetScene}/>
 
+<PageTransition>
 <section>
    <canvas bind:this={canvas}></canvas>
 
@@ -256,7 +258,7 @@
 
    <h1>Generator</h1>
 
-   <div class="content">
+   <div class="content" >
 
       <!-- left side -->
       <div id="card" class="w50 bottomCenter">
@@ -267,20 +269,22 @@
          </div>
       </div>
 
-
       <!-- right side -->
       <div id="list" class="w50">
 
          <div class="selectedSpellList">
             {#if selectedSpells.length == 0}
-               <p class="directions" in:fade={{duration: 1000}} out:fade={{duration: 100}}>
+               <p class="directions" 
+                  in:fade={{duration: 1000}} 
+                  out:fade|local={{duration: 100}}
+                  >
                   <span>[!]</span>Type some spell names into the box to add 
                   them to your book. Once you've added everything, hit generate!</p>
             {/if}
 
             {#each selectedSpells as spell, i}
                <!-- svelte-ignore a11y-click-events-have-key-events -->
-               <div class="selectedSpell" on:click={() => removeSpell(i)} transition:fly={{duration: 200, y:20}}> 
+               <div class="selectedSpell" on:click={() => removeSpell(i)} transition:fly|local={{duration: 200, y:20}}> 
                   <p>{spell[0]}</p>
                </div>
             {/each}
@@ -294,7 +298,10 @@
 
             <!-- generate button -->
             {#if selectedSpells.length > 0}
-               <button on:click={generateButtonClick} transition:fade={{duration:100}}>Generate</button>
+               
+               <button on:click={generateButtonClick} transition:fade|local={{duration:100}}>
+               {generateBook ? "WIP :/":"Generate"}
+               </button>
             {/if}
          </div >
 
@@ -312,6 +319,7 @@
    </div>
 </section>
 
+</PageTransition>
 
 <style>
    .list{

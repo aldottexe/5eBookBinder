@@ -2,7 +2,6 @@
    import * as htmlToImage from "html-to-image";
    import {tick} from "svelte";
    import {fade} from 'svelte/transition'
-   import {downloadImages} from '$lib/zip.js'
    
    const ppi = 300;
    const pixelRatio = ppi / 100;
@@ -86,9 +85,14 @@
       }
    
       spellImages = await Promise.all(spellImages);
+
    
+      console.log(spellImages);
       return spellImages;
    }
+
+
+
    
    async function chopAtOverflow(element, spellDataObject){
       let newDesc = "";
@@ -156,15 +160,6 @@
 
 <!-- displays the final images -->
 {#if spellImages.length > 0}
-   <!-- svelte-ignore a11y-click-events-have-key-events -->
-   <div class="display" transition:fade={{duration:250}}>
-      <div class="close" on:click={ () => {spellImages = []; onClose()} }></div>
-      <div>
-         <img class="spellCard" src={spellImages[selectedCard]} alt="">
-         <input type="range" min="0" max={spellImages.length - 1} bind:value={selectedCard}/>
-         <button on:click={()=>downloadImages(spellImages)}>download</button>
-      </div>
-   </div>
 {/if}
 
 
@@ -173,6 +168,7 @@
       font-size: 10px;
       font-family: "comic sans ms";
       color: black;
+      line-height: unset;
    }
    .card{
       background-color: white;
@@ -190,6 +186,9 @@
       margin-bottom: 0;
       padding-bottom: 0;
    }
+   .card :global(ul){
+      padding-left: 20px;
+   }
    .level{
       padding: 0;
       padding-bottom: 10px;
@@ -200,22 +199,17 @@
       transform: translateY(-3px);
 
    }
-   img{
-      width: 30vw;
-   }
    .hidden{
       height: 0;
+      /* opacity: 20%; */
       overflow: hidden;
    }
    b{
       font-weight: bold;
    }
-   :global(ul){
-      padding-left: 20px;
-   }
    .display{
       position: absolute;
-      z-index: 999;
+      overflow: hidden;
       display: flex;
       justify-content: center;
       align-content: center;
@@ -235,7 +229,12 @@
       z-index: -1;
    }
    button{
+      color: #f4f4f4ff;
       background-color: #00000000;
       border: none;
+      transition: color 500ms;
+   }
+   button:hover{
+      color: #f4f4f488;
    }
 </style>
