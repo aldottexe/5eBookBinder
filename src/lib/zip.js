@@ -11,7 +11,7 @@ export async function downloadImages(images) {
 
       console.log(blob);
 
-      zip.file(`page ${i + 1}.png`, blob);
+      zip.file(`${i + 1}.png`, blob);
    });
 
    await Promise.all(promises);

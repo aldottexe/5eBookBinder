@@ -8,7 +8,7 @@ export function setupScene(canvas, window) {
       canvas,
    });
    renderer.setPixelRatio(window.devicePixelRatio);
-   renderer.setSize(window.innerWidth, window.innerHeight);
+   renderer.setSize(window.innerWidth, window.innerHeight, false);
 
    //CAMERA
    const fov = 75;
@@ -41,7 +41,7 @@ export function setupScene(canvas, window) {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setSize(window.innerWidth, window.innerHeight, false);
    });
 
    const redraw = () => renderer.render(scene, camera);

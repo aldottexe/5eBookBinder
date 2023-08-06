@@ -5,24 +5,52 @@ body {
    background-color: #262626;
 }
 * {
-   font-size: 30px;
    color: #f4f4f4;
    font-family: vendetta, serif;
    /* font-family: "Rubik", sans-serif; */
    font-weight: 500;
 }
+h2, h3{
+   font-size: 3.5rem;
+   font-weight: 700;
+   margin: 0;
+}
 p {
-   font-size: 30px;
+   font-size: 2rem;
    line-height: 35px;
 }
 h1 {
    letter-spacing: -7px;
    font-weight: 700;
    font-style: normal;
-   font-size: 120px;
+   font-size: 7.5rem;
    margin: 0;
 }
 canvas {
    position: absolute;
+   overflow: hidden;
    z-index: -1;
+   width: 100vw;
+   height: 100vh;
+}
+div, input, button{
+   font-size: 2rem;
+}
+
+
+.directions{
+   opacity: 50%;
+   position: relative;
+   max-width: 430px;
+}
+.directions span{
+   font-size: 35px;
+   position: absolute;
+   transform: translateX(-40px) rotateZ(-5deg);
+}
+@media(max-width: 800px){
+   h1{
+      font-size: 5rem;
+   letter-spacing: -5px;
+   }
 }

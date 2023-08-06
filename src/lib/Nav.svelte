@@ -7,7 +7,7 @@
       Home
    </a>
    <a href="/gen">
-      Generator
+      Generate
    </a>
    <a href="/about">
       About
@@ -24,7 +24,7 @@ nav a{
    margin: 20px;
    opacity: 100%;
    transition: opacity .5s;
-   font-size: 21px;
+   font-size: 1.4rem;
 }
 nav a:hover{
    opacity: 50%;

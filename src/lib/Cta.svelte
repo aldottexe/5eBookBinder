@@ -20,7 +20,7 @@ button{
    background-color: #00000000;
    color: #efefef;
    padding: 10px;
-   padding-top: 270px;
+   padding-top: calc(100vh - 380px);
    font-size: 20px;
    border-radius: 20px;
    border: none;

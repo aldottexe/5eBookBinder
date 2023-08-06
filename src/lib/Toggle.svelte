@@ -18,8 +18,11 @@
 div{
    display: inline-block;
    margin: 4px;
+   height: 18px;
+   width: 60px;
 }
 button{
+   position: absolute;
    background-color: #00000000;
    color: black;
    border: #f4f4f4 solid 2px;
