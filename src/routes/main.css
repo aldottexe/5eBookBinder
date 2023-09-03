@@ -1,14 +1,26 @@
 @import url("https://use.typekit.net/ktu8kpk.css");
+
+:root{
+   --dark: #262626;
+   --light: #f4f4f4;
+   --tlight: #f4f4f488;
+}
+
 body {
    margin: 0;
    padding: 0;
-   background-color: #262626;
+   background-color: var(--dark);
 }
 * {
-   color: #f4f4f4;
+   color: var(--light);
    font-family: vendetta, serif;
    /* font-family: "Rubik", sans-serif; */
    font-weight: 500;
+   scrollbar-width: none;
+   ms-overflow-style: none;
+}
+*::-webkit-scrollbar{
+   display: none;
 }
 h2, h3{
    font-size: 3.5rem;

@@ -128,7 +128,7 @@
 
 <style>
    button{
-      color: #f4f4f4ff;
+      color: var(--light);
       background-color: #00000000;
       border: none;
       transition: opacity 500ms;

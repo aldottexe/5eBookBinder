@@ -1,13 +1,9 @@
 <script>
    import * as htmlToImage from "html-to-image";
    import { tick } from "svelte";
-   import { fade } from "svelte/transition";
 
    const ppi = 300;
    const pixelRatio = ppi / 100;
-
-   // the card that the user is viewing
-   let selectedCard = 0;
 
    // the accent color based on spell level
    const colors = [
@@ -135,16 +131,30 @@
    <div class="card" bind:this={cardTemplate}>
       <h1>{cardTemplateData.title}</h1>
 
-      <p class="level" style={`color: ${colors[cardTemplateData.level]}`}>
+      <p class="level" 
+         style={`color: ${colors[cardTemplateData.level]}`}
+      >
          {cardTemplateData.level === 0
             ? "Cantrip"
             : `Level ${cardTemplateData.level}`}
       </p>
 
-      <div><b>Casting Time:</b> {cardTemplateData["casting time"]}</div>
-      <div><b>Range:</b> {cardTemplateData["range"]}</div>
-      <div><b>Components:</b> {cardTemplateData["componenents"]}</div>
-      <div><b>Duration:</b> {cardTemplateData["duration"]}</div>
+      <div>
+         <b>Casting Time:</b>
+         {cardTemplateData["casting time"]}
+      </div>
+      <div>
+         <b>Range:</b>
+         {cardTemplateData["range"]}
+      </div>
+      <div>
+         <b>Components:</b>
+         {cardTemplateData["componenents"]}
+      </div>
+      <div>
+         <b>Duration:</b>
+         {cardTemplateData["duration"]}
+      </div>
 
       <p>
          {@html cardTemplateData.description}
@@ -200,20 +210,5 @@
    }
    b {
       font-weight: bold;
-   }
-   .display {
-      position: absolute;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-content: center;
-      flex-wrap: wrap;
-      text-align: center;
-      width: 100vw;
-      height: 100vh;
-      background-color: #00000088;
-   }
-   .spellCard {
-      display: block;
    }
 </style>

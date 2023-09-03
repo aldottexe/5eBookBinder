@@ -4,18 +4,20 @@
    import Nav from "$lib/Nav.svelte";
    import Toggle from "$lib/Toggle.svelte";
    import Generator from "$lib/Generator.svelte";
+   import PageTransition from "$lib/PageTransition.svelte";
 
+   import { onMount } from "svelte";
    import { fade, fly } from "svelte/transition";
    import { spring } from "svelte/motion";
-   import PageTransition from "$lib/PageTransition.svelte";
 
    import * as THREE from "three";
    import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
    import { setupScene } from "$lib/3dHelper.js";
-   import { onMount } from "svelte";
 
    // the list of spells the user wants in their book
    import { selectedSpells } from "$lib/stores.js";
+
+   import Settings from "$lib/settings.svelte";
 
    // keeps track of what the user typed into the seach bar
    let userInput = "";
@@ -26,19 +28,16 @@
    // toggles whether you wanna generate cards or a spellbook
    let toggleSelection;
    let generateBook = false;
+   
+   let showSettings = false;
 
    // a ref to an anchor that points to the done page
    let nextLink;
 
+   // a function that runs when you click the generate button
    let generateButtonClick;
 
    let useOffset = true;
-
-   // the generate function that gets
-   // assigned when the generator componenent is rendered
-   let generate;
-
-   let resetScene;
 
    let xOffset = spring(0, { duration: 100 });
 
@@ -239,17 +238,9 @@
             // nextLink.click()
          }
       };
-
-      resetScene = () => {
-         open.set({ b: 0, c: 0 });
-         useOffset = true;
-         calculateXOffset();
-         toggleSelection();
-      };
    });
 </script>
 
-<Generator bind:generate onClose={resetScene} />
 
 <a href="./done" bind:this={nextLink} />
 
@@ -260,6 +251,10 @@
       <Nav />
 
       <h1>Generate</h1>
+
+      <Settings bind:showSettings={showSettings} settings={{"fonts":["comic-sans"]}}/>
+      <button on:click={()=>showSettings = ! showSettings}>show settings</button>
+
 
       <div class="content">
          <!-- left side -->
@@ -378,7 +373,7 @@
       position: absolute;
       width: 400px;
       transform: scaleY(0.6);
-      color: #f4f4f4;
+      color: var(--light);
    }
    h1 {
       text-align: center;
@@ -393,7 +388,7 @@
       width: fit-content;
       box-sizing: border-box;
       padding: 0 5px;
-      background-color: #262626;
+      background-color: var(--dark);
    }
    .suggestion {
       display: inline-block;
@@ -426,7 +421,7 @@
       border: none;
       border-radius: 0px;
       padding: 5px;
-      border-bottom: solid 2px #f4f4f4;
+      border-bottom: solid 2px var(--light);
       margin-right: 10px;
    }
    .searchBar:focus {
@@ -443,7 +438,7 @@
    .toggle {
       width: 215px;
       margin: 0 auto;
-      color: #f4f4f488;
+      color: var(--tlight);
    }
    #card {
       flex-direction: column-reverse;

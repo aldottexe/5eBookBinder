@@ -26,7 +26,7 @@
       const { redraw, scene, camera } = setupScene(canvas, window);
 
       // GRADIENTMAP
-      let gmap = await new Promise((res) => {
+      let gmap = new Promise((res) => {
          new THREE.TextureLoader().load("/fiveTone.jpg", (gmap) => {
             gmap.minFilter = THREE.NearestFilter;
             gmap.magFilter = THREE.NearestFilter;
@@ -36,9 +36,9 @@
 
       // MATERIAL
       const material = new THREE.MeshToonMaterial();
-      material.gradientMap = gmap;
+      material.gradientMap = await gmap;
 
-      // BOOK
+     // BOOK
       let book = await new Promise((res) => {
          new GLTFLoader().load("/book.glb", (gltf) => {
             res(gltf.scenes[0].children[0]);
@@ -77,7 +77,6 @@
       }
 
       click = () => {
-         console.log("click");
          idle = false;
          cameraXY.set({ x: 0, y: 3 });
          let rotations = book.rotation.y - (book.rotation.y % 6.28);
