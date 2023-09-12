@@ -3,7 +3,6 @@
    import spellList from "./spellList.json";
    import Nav from "$lib/Nav.svelte";
    import Toggle from "$lib/Toggle.svelte";
-   import Generator from "$lib/Generator.svelte";
    import PageTransition from "$lib/PageTransition.svelte";
 
    import { onMount } from "svelte";
@@ -109,7 +108,6 @@
       const calculateXOffset = () => {
          if (useOffset) {
             let yoff = -(800 - window.innerHeight) / 220 + 0.3;
-            console.log(yoff);
             let xoff = (-2.6 * window.innerWidth) / 1000 + 2.2 + yoff;
             xOffset.set(xoff);
          } else xOffset.set(0);
@@ -250,15 +248,15 @@
 
       <Nav />
 
+      <Settings bind:showSettings={showSettings} settings={{"fonts":["comic-sans"]}}/>
       <h1>Generate</h1>
 
-      <Settings bind:showSettings={showSettings} settings={{"fonts":["comic-sans"]}}/>
-      <button on:click={()=>showSettings = ! showSettings}>show settings</button>
 
 
       <div class="content">
          <!-- left side -->
          <div id="card" class="w50 bottomCenter">
+            <img class="gear" src="gear.svg" alt="" height="30px" on:click={()=>showSettings = ! showSettings}>
             <div class="toggle">
                Cards
                <Toggle bind:state={generateBook} onClick={toggleSelection} />
@@ -332,6 +330,17 @@
 </PageTransition>
 
 <style>
+   .gear{
+      margin-left: 20%;
+      opacity: 50%;
+      position:relative;
+      transform: rotate(0turn);
+      transition: all .5s ease;
+   }
+   .gear:hover{
+      transform: rotate(.25turn) scale(1.2);
+      opacity: 100%;
+   }
    .list {
       position: relative;
       transform: rotate3d(1, 2, 3, 20deg);
@@ -427,22 +436,16 @@
    .searchBar:focus {
       outline: none;
    }
-   img {
-      width: 100%;
-   }
-   .bottomCenter {
+   #card {
       display: flex;
-      justify-content: center;
-      align-items: end;
+      align-items: flex-start;
+      flex-direction: column;
+      justify-content: space-between;
    }
    .toggle {
       width: 215px;
       margin: 0 auto;
       color: var(--tlight);
-   }
-   #card {
-      flex-direction: column-reverse;
-      justify-content: flex-start;
    }
    canvas {
       position: absolute;
@@ -455,6 +458,9 @@
    @media (max-width: 900px) {
       .w50 {
          width: unset;
+      }
+      .gear{
+         margin-left: 0;
       }
    }
    @media (max-width: 740px) {

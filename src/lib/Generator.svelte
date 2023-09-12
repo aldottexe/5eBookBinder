@@ -1,6 +1,7 @@
 <script>
    import * as htmlToImage from "html-to-image";
    import { tick } from "svelte";
+   import { settings } from "$lib/stores.js";
 
    const ppi = 300;
    const pixelRatio = ppi / 100;
@@ -20,14 +21,11 @@
    ];
 
    let generatorOptions = {
-      width: 300,
-      height: 400,
+      width: $settings["width"] * 100,
+      height: $settings["height"] * 100,
       pixelRatio: pixelRatio,
       style: {
          backgroundColor: "white",
-         fontFamily: "comic sans ms",
-         width: "300px",
-         height: "400px",
       },
    };
 
@@ -128,12 +126,19 @@
 
 <!-- a hidden place to render the html for the cards -->
 <div class="hidden">
-   <div class="card" bind:this={cardTemplate}>
+   <div
+      class="card"
+      bind:this={cardTemplate}
+      style={`
+            --body-size: ${$settings["body-size"]}px;
+            --h-size: ${$settings["h-size"]}px;
+            --level-size: ${$settings["level-size"]}px;
+            --font: ${$settings["font-index"]};
+         `}
+   >
       <h1>{cardTemplateData.title}</h1>
 
-      <p class="level" 
-         style={`color: ${colors[cardTemplateData.level]}`}
-      >
+      <p class="level" style={`color: ${colors[cardTemplateData.level]}`}>
          {cardTemplateData.level === 0
             ? "Cantrip"
             : `Level ${cardTemplateData.level}`}
@@ -161,7 +166,16 @@
       </p>
    </div>
 
-   <div class="card" bind:this={cardOverflowTemplate}>
+   <div
+      class="card"
+      bind:this={cardOverflowTemplate}
+      style={`
+            --body-size: ${$settings["body-size"]}px;
+            --h-size: ${$settings["h-size"]}px;
+            --level-size: ${$settings["level-size"]}px;
+            --font: ${$settings["font-index"]};
+         `}
+   >
       <p>
          {@html descOverflow}
       </p>
@@ -170,8 +184,8 @@
 
 <style>
    .card :global(*) {
-      font-size: 10px;
-      font-family: "comic sans ms";
+      font-size: var(--body-size);
+      font-family: var(--font);
       color: black;
       line-height: unset;
    }
@@ -185,7 +199,7 @@
    }
    .card :global(h1) {
       letter-spacing: 0;
-      font-size: 24px;
+      font-size: var(--h-size);
       margin-top: 0;
       padding-top: 0;
       margin-bottom: 0;
@@ -198,7 +212,7 @@
       padding: 0;
       padding-bottom: 10px;
       margin: 0;
-      font-size: 16px;
+      font-size: var(--level-size);
       font-weight: bold;
       position: relative;
       transform: translateY(-3px);
