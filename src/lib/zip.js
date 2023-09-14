@@ -3,9 +3,9 @@ import { saveAs } from "file-saver";
 
 // takes a list of images and returns some kind of zip
 export async function downloadImages(images) {
-   let zip = new JSZip();
+   const zip = new JSZip();
 
-   let promises = images.map(async (image, i) => {
+   const promises = images.map(async (image, i) => {
       const res = await fetch(image);
       const blob = await res.blob();
 

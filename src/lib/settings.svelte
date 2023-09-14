@@ -16,16 +16,18 @@
    <div class="content" transition:fade|local={{ duration: 100 }}>
       <div class="controls">
          <h2>Settings</h2>
-
          <label for="">Font</label>
-         <select name="Font" bind:value={$settings["font-index"]}>
-            {#each $settings.fonts as f}
-               <option value={f}>
-                  {f}
-               </option>
-            {/each}
-         </select>
-
+         <div>
+            &gt
+            <select name="Font" bind:value={$settings["font-index"]}>
+               {#each $settings.fonts as f}
+                  <option value={f}>
+                     {f}
+                  </option>
+               {/each}
+            </select>
+            &lt
+         </div>
          <hr />
 
          <label for="">Title</label>
@@ -35,19 +37,19 @@
             min="0"
             bind:value={$settings["h-size"]}
          />
-         <label for="">Body</label>
-         <input
-            type="range"
-            max="50"
-            min="0"
-            bind:value={$settings["body-size"]}
-         />
          <label for="">Level</label>
          <input
             type="range"
             max="50"
             min="0"
             bind:value={$settings["level-size"]}
+         />
+         <label for="">Body</label>
+         <input
+            type="range"
+            max="20"
+            min="0"
+            bind:value={$settings["body-size"]}
          />
 
          <hr />
@@ -105,6 +107,7 @@
       justify-content: center;
       align-items: center;
       padding-top: 30px;
+      padding-bottom: 50px;
       z-index: 99;
       width: 100vw;
    }
@@ -120,6 +123,23 @@
       font-size: 18px;
       border: none;
       background-color: #00000000;
+   }
+   .controls select {
+      appearance: none;
+      display: inline;
+   }
+   .controls select:focus{
+      appearance: none;
+   }
+
+   .controls div{
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+   }
+   option::after {
+      color: white;
+      content: "<--";
    }
    input[type="range"] {
       appearance: none;
@@ -147,9 +167,9 @@
       border: none;
       position: relative;
       transform: scale(1);
-      transition: all .5s ease;
+      transition: all 0.5s ease;
    }
-   .controls button:hover{
+   .controls button:hover {
       transform: scale(1.2);
    }
 
